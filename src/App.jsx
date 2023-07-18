@@ -13,19 +13,34 @@ import usePagination from './assets/components/pagination'
 // y el hook useEffect para aplicar el filtro cuando cambie la categoría seleccionada.
 
 export function App () {
-  const { content, loadNextPage } = usePagination(10, 1)
+  const pageSize = 10
+  const { content, currentPage, goToPage } = usePagination(pageSize)
+
+  const totalPages = Math.ceil(content.length / pageSize)
+
+  // renderizamos películas desde la página actual (al principio es página 1 -1 = 0) hasta el tamaño de la página (5), por tanto se renderizan del 0 al 5
+  const renderMovies = content.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  )
 
   return (
     <main style={{ display: 'flex', flexDirection: 'column', alignContent: 'center', alignItems: 'center', textAlign: 'center,' }}>
       <Counter />
       <OrderList />
       <div>
-        <ul>
-          {content.map(movie => (
-            <li key={movie.originalTitleText.text}>{movie.originalTitleText.text}</li>
+        <ul style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', flexDirection: 'row' }}>
+          {renderMovies.map(movie => (
+            <li style={{ width: '20%' }} key={movie._id}>
+              <h3 style={{ fontSize: '1rem' }}>{movie.originalTitleText.text}</h3>
+              <p>{movie.releaseYear.year}</p>
+              {/* <img style={{ width: '150px' }} src={movie.primaryImage.url} alt={movie.originalTitleText.text} /> */}
+            </li>
           ))}
         </ul>
-        <button onClick={loadNextPage}>Load Next Page</button>
+        <button disabled={currentPage === 1} onClick={() => goToPage(currentPage - 1)}>Load Previous Page</button>
+        <span style={{ padding: '15px' }}>{currentPage}</span>
+        <button disabled={currentPage === totalPages} onClick={() => goToPage(currentPage + 1)}>Load Next Page</button>
       </div>
     </main>
   )

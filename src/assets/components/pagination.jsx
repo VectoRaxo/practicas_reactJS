@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react"
-
+// import responseMovies from '../mocks/with-results.json'
 // definimos el custom hook con los parámetros que nos interesan: tamaño de la página y a qué nº página queremos acceder
-const usePagination = (size, page = 1) => {
+const usePagination = (pageSize) => {
   const [content, setContent] = useState([])
+  const [currentPage, setCurrentPage] = useState(1)
 
   const getSeries = async () => {
-    const url = `https://moviesdatabase.p.rapidapi.com/titles/random?limit=${size}&list=most_pop_movies`
+    const url = `https://moviesdatabase.p.rapidapi.com/titles?page=${currentPage}&limit=50`
     const options = {
       method: 'GET',
       headers: {
@@ -24,14 +25,15 @@ const usePagination = (size, page = 1) => {
   }
   useEffect(() => {
     getSeries()
-  }, [page])
+  }, [currentPage])
 
+  const goToPage = (page) => {
+    setCurrentPage(page)
+  }
   return {
     content,
-    loadNextPage: () => {
-      page++
-      getSeries()
-    }
+    currentPage,
+    goToPage
   }
 }
 export default usePagination
